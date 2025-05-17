@@ -47,6 +47,8 @@ export const login = createRoute({
     ),
   },
 });
+export const routes = [register, login];
+export type RegisterRequest = z.infer<typeof register.request.body>;
 
 export type RegisterRoute = typeof register;
 export type LoginRoute = typeof login;
