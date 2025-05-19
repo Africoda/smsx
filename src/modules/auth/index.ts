@@ -1,7 +1,7 @@
 import { createRouter } from "@/lib/create-app";
 
-import * as handlers from "./auth.handlers";
-import * as routes from "./auth.routes";
+import * as handlers from "./handlers";
+import * as routes from "./routes";
 
 const router = createRouter();
 
