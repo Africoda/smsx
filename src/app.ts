@@ -1,22 +1,33 @@
+import { jwt } from "hono/jwt";
+
+import env from "@/env";
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
 import auth from "@/modules/auth/index";
-import tasks from "@/modules/tasks/tasks.index";
-import index from "@/routes/index.route";
+import index from "@/routes/index";
 
 const app = createApp();
 
 configureOpenAPI(app);
 
-const routes = [
-  index,
-  auth,
-] as const;
+const publicRoutes = [auth] as const;
 
-routes.forEach((route) => {
-  app.route("/", route);
-});
+const routes = [index] as const;
 
-export type AppType = typeof routes[number];
+for (const route of publicRoutes) {
+  app.route("/api/auth/*", route);
+}
+
+app.use(
+  "/api/*",
+  jwt({
+    secret: env.JWT_SECRET,
+  }),
+);
+
+for (const route of routes) {
+  app.route("/api/", route);
+}
+export type AppType = (typeof routes)[number];
 
 export default app;
