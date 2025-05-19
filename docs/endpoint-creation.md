@@ -1,23 +1,38 @@
 ## Endpoint Creation
 
+---
+
+### Overview
+
+This section outlines how to define, document, and register API endpoints in
+SMSX using Hono, Zod, and the `createRouter` pattern. It supports both
+**manual** and **dynamic** route definition workflows.
+
+---
+
 ### 1. Define Routes Using `createRouter`
 
-- **Step 1: Create a Router**
+#### Step 1: Import `createRouter`
 
-  ```typescript
-  import { createRouter } from "@/lib/create-app";
-  ```
+```ts
+import { createRouter } from "@/lib/create-app";
+```
 
-- **Step 2: OpenAPI Function**
-  - The openAPI function takes two parameters:
-    1. A route defined using `createRoute`.
-    2. A handler or controller to handle the request.
+#### Step 2: Use `.openapi()` to Register Routes
 
-### Example Usage
+The `openapi()` method links:
 
-#### Simple Example
+1. A route schema defined using `createRoute`.
+2. A handler/controller function.
 
-```typescript
+---
+
+### Simple Example
+
+```ts
+import { createMessageObjectSchema } from "@/shared/schemas";
+
+import { createRouter } from "@/lib/create-app";
 import { createRoute, HttpStatusCodes, jsonContent } from "@/lib/types";
 
 const router = createRouter()
@@ -35,12 +50,16 @@ const router = createRouter()
     }),
     c => c.json({ message: "Tasks API" }, HttpStatusCodes.OK),
   );
+
+export default router;
 ```
 
-#### Advanced Example
+---
 
-```typescript
-import { createRoute, HttpStatusCodes, jsonContent } from "@/lib/types";
+### Advanced Example
+
+```ts
+import { createRouter } from "@/lib/create-app";
 
 import * as handlers from "./tasks.handlers";
 import * as routes from "./tasks.routes";
@@ -51,71 +70,78 @@ const router = createRouter()
   .openapi(routes.getOne, handlers.getOne)
   .openapi(routes.patch, handlers.patch)
   .openapi(routes.remove, handlers.remove);
+
+export default router;
 ```
 
-### Refactored for Simplicity
+---
 
-- **Create Services**
+### 🔄 Modular Route Setup
 
-  ```typescript
-  // services/businessLogic.ts
-  export function doSomething() {
-    // Business logic implementation
-  }
-  ```
+#### Step 1: Create a Service
 
-- **Create Controllers or Handlers**
+```ts
+// services/businessLogic.ts
+export function doSomething() {
+  return { status: "OK" };
+}
+```
 
-  - Use a consistent naming convention (e.g., `controller`).
+#### Step 2: Create a Controller
 
-  ```typescript
-  // controllers/defaultController.ts
-  import { createRoute, HttpStatusCodes, jsonContent } from "@/lib/types";
+```ts
+// controllers/defaultController.ts
+import { HttpStatusCodes } from "@/lib/types";
 
-  import { doSomething } from "../services/businessLogic";
+import { doSomething } from "../services/businessLogic";
 
-  export const defaultController: AppRouteHandler = async (c) => {
-    return c.json({ message: "Default Controller", data: await doSomething() }, HttpStatusCodes.OK);
-  };
-  ```
+export async function defaultController(c) {
+  return c.json(
+    { message: "Default Controller", data: doSomething() },
+    HttpStatusCodes.OK,
+  );
+}
+```
 
-- **Create Routes Dynamically**
+#### Step 3: Use Dynamic Route Setup Helper
 
-  ```typescript
-  // utils/routeSetup.ts
-  import { createRoute, HttpStatusCodes, jsonContent } from "@/lib/types";
+```ts
+// utils/routeSetup.ts
+import { createRoute } from "@hono/zod-openapi";
+import * as HttpStatusCodes from "stoker/http-status-codes";
+import { jsonContent } from "stoker/openapi/helpers";
 
-  import * as routes from "./tasks.routes";
+import { createRouter } from "@/lib/create-app";
 
-  export function setupRoute(config: {
-    method: string;
-    path: string;
-    controller: AppRouteHandler;
-    responseSchema: any;
-    tags?: string[];
-  }) {
-    const router = createRouter();
-    router.openapi(
-      createRoute({
-        tags: config.tags || ["Default"],
-        method: config.method,
-        path: config.path,
-        responses: {
-          [HttpStatusCodes.OK]: jsonContent(config.responseSchema, `Response for ${config.path}`),
-        },
-      }),
-      config.controller
-    );
-    return router;
-  }
-  ```
+export function setupRoute(config) {
+  const router = createRouter();
+  router.openapi(
+    createRoute({
+      tags: config.tags || ["Default"],
+      method: config.method,
+      path: config.path,
+      responses: {
+        [HttpStatusCodes.OK]: jsonContent(
+          config.responseSchema,
+          `Response for ${config.path}`,
+        ),
+      },
+    }),
+    config.controller,
+  );
+  return router;
+}
+```
 
-### Using the Dynamic Route Setup
+#### Step 4: Use Dynamic Route
 
-```typescript
+```ts
+import { createMessageObjectSchema } from "@/shared/schemas";
+
+import { defaultController } from "../controllers/defaultController";
+// routes/tasks.route.ts
 import { setupRoute } from "../utils/routeSetup";
 
-// Define your route setup configuration
 const routeConfig = {
   method: "get",
   path: "/tasks",
@@ -124,7 +150,17 @@ const routeConfig = {
   tags: ["Tasks"],
 };
 
-// Set up the route dynamically
 const router = setupRoute(routeConfig);
 export default router;
 ```
+
+---
+
+### ✨ Summary
+
+- Use `createRouter().openapi(...)` for static endpoints.
+- Use `setupRoute()` for reusable dynamic route creation.
+- Always keep routes cleanly separated from business logic.
+- Follow consistent naming: `handlers`, `services`, `routes`, `controller`.
+
+> Write routes as **contracts**: typed, documented, and version-ready.
