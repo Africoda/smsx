@@ -1,11 +1,12 @@
-import type { Schema } from "hono";
+import type { Context, Schema } from "hono";
 
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { requestId } from "hono/request-id";
-import { notFound, onError, serveEmojiFavicon } from "stoker/middlewares";
+import { notFound, serveEmojiFavicon } from "stoker/middlewares";
 import { defaultHook } from "stoker/openapi";
 
 import { pinoLogger } from "@/middlewares/pino-logger";
+import { errorHandler } from "@/utils/error";
 
 import type { AppBindings, AppOpenAPI } from "./types";
 
@@ -14,6 +15,12 @@ export function createRouter() {
     strict: false,
     defaultHook,
   });
+}
+
+export function onError(err: Error, c: Context) {
+  const logger = c.get("logger");
+  logger.error({ err }, "Unhandled application error");
+  return errorHandler(err, c);
 }
 
 export default function createApp() {

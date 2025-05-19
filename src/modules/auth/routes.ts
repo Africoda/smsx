@@ -2,7 +2,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 
-import { insertUsersSchema, selectUsersSchema } from "@/db/schema";
+import { insertUsersSchema, selectUsersSchema } from "@/db/schema/schema";
 import { unauthorizedSchema } from "@/lib/constants";
 
 const tags = ["Auth"];

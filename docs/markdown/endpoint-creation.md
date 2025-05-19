@@ -103,63 +103,11 @@ export async function defaultController(c) {
 }
 ```
 
-#### Step 3: Use Dynamic Route Setup Helper
-
-```ts
-// utils/routeSetup.ts
-import { createRoute } from "@hono/zod-openapi";
-import * as HttpStatusCodes from "stoker/http-status-codes";
-import { jsonContent } from "stoker/openapi/helpers";
-
-import { createRouter } from "@/lib/create-app";
-
-export function setupRoute(config) {
-  const router = createRouter();
-  router.openapi(
-    createRoute({
-      tags: config.tags || ["Default"],
-      method: config.method,
-      path: config.path,
-      responses: {
-        [HttpStatusCodes.OK]: jsonContent(
-          config.responseSchema,
-          `Response for ${config.path}`,
-        ),
-      },
-    }),
-    config.controller,
-  );
-  return router;
-}
-```
-
-#### Step 4: Use Dynamic Route
-
-```ts
-import { createMessageObjectSchema } from "@/shared/schemas";
-
-import { defaultController } from "../controllers/defaultController";
-// routes/tasks.route.ts
-import { setupRoute } from "../utils/routeSetup";
-
-const routeConfig = {
-  method: "get",
-  path: "/tasks",
-  controller: defaultController,
-  responseSchema: createMessageObjectSchema("Tasks API"),
-  tags: ["Tasks"],
-};
-
-const router = setupRoute(routeConfig);
-export default router;
-```
-
 ---
 
 ### ✨ Summary
 
 - Use `createRouter().openapi(...)` for static endpoints.
-- Use `setupRoute()` for reusable dynamic route creation.
 - Always keep routes cleanly separated from business logic.
 - Follow consistent naming: `handlers`, `services`, `routes`, `controller`.
 
