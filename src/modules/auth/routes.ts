@@ -3,6 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 
 import { insertUsersSchema, selectUsersSchema } from "@/db/schema";
+import { unauthorizedSchema } from "@/lib/constants";
 
 const tags = ["Auth"];
 
@@ -42,8 +43,13 @@ export const login = createRoute({
       z.object({
         token: z.string(),
         user: selectUsersSchema.omit({ password: true }),
+        message: z.string(),
       }),
       "Login successful",
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      unauthorizedSchema,
+      "Invalid credentials",
     ),
   },
 });

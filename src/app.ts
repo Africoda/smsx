@@ -1,6 +1,6 @@
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
-import auth from "@/modules/auth/auth.index";
+import auth from "@/modules/auth/index";
 import tasks from "@/modules/tasks/tasks.index";
 import index from "@/routes/index.route";
 
@@ -11,7 +11,6 @@ configureOpenAPI(app);
 const routes = [
   index,
   auth,
-  tasks,
 ] as const;
 
 routes.forEach((route) => {
