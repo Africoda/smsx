@@ -4,6 +4,7 @@ import env from "@/env";
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
 import auth from "@/modules/auth/index";
+import contact from "@/modules/contacts/index";
 import index from "@/routes/index";
 
 const app = createApp();
@@ -12,10 +13,10 @@ configureOpenAPI(app);
 
 const publicRoutes = [auth] as const;
 
-const routes = [index] as const;
+const routes = [index, contact] as const;
 
 for (const route of publicRoutes) {
-  app.route("/api/auth/*", route);
+  app.route("/api", route);
 }
 
 app.use(
@@ -26,7 +27,7 @@ app.use(
 );
 
 for (const route of routes) {
-  app.route("/api/", route);
+  app.route("/api", route);
 }
 export type AppType = (typeof routes)[number];
 

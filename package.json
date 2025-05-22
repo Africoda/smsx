@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
     "test": "cross-env NODE_ENV=test vitest",
-    "build": "tsc && tsc-alias"
+    "build": "tsc && tsc-alias",
+    "migrate": "drizzle-kit push --out-dir ./migrations"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.8",
