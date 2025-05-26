@@ -54,5 +54,38 @@ export const login = createRoute({
   },
 });
 
+export const refreshToken = createRoute({
+  method: "post",
+  path: "/auth/refresh",
+  tags: ["Auth"],
+  responses: {
+    [HttpStatusCodes.ACCEPTED]: jsonContent(
+      z.object({
+        token: z.string(),
+        message: z.string(),
+      }),
+      "New access token",
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(unauthorizedSchema, "Invalid or expired refresh token"),
+  },
+});
+
+export const logout = createRoute({
+  method: "get",
+  path: "/auth/logout",
+  tags: ["Auth"],
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.object({
+        message: z.string(),
+      }),
+      "Logout successful",
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(unauthorizedSchema, "Not authenticated"),
+  },
+});
+
+export type RefreshRoute = typeof refreshToken;
+export type LogoutRoute = typeof logout;
 export type RegisterRoute = typeof register;
 export type LoginRoute = typeof login;

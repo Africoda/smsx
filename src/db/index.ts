@@ -3,6 +3,7 @@ import postgres from "postgres";
 
 import env from "@/env";
 
+import * as authSchema from "./schema/auth";
 import * as notificationSchema from "./schema/notifications";
 import * as schema from "./schema/schema";
 
@@ -15,6 +16,7 @@ const db = drizzle(client, {
   schema: {
     ...schema,
     ...notificationSchema,
+    ...authSchema,
   },
 });
 

@@ -27,6 +27,7 @@ export const insertContactsSchema = createInsertSchema(contacts).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  userId: true,
 });
 
 export const selectUsersSchema = createSelectSchema(users);

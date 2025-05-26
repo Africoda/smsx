@@ -8,6 +8,17 @@ import contactService from "./service";
 
 export const create: AppRouteHandler<CreateContactRoute> = async (c) => {
   const data = c.req.valid("json");
-  const contact = await contactService.createContact(data);
+  const userId = c.get("jwt").jwtPayload?.userId;
+  if (!userId) {
+    return c.json({ message: "Unauthorized" }, HttpStatusCodes.UNAUTHORIZED);
+  }
+  const contactData = {
+    ...data,
+    userId,
+  };
+  const contact = await contactService.createContact(contactData);
+  if (!contact) {
+    return c.json({ message: "Failed to create contact" }, HttpStatusCodes.BAD_REQUEST);
+  }
   return c.json(contact, HttpStatusCodes.CREATED);
 };

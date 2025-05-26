@@ -10,6 +10,11 @@ export const createContact = createRoute({
   path: "/contacts",
   method: "post",
   tags: ["Contacts"],
+  security: [
+    {
+      Bearer: [],
+    },
+  ],
   request: {
     body: jsonContentRequired(insertContactsSchema, "Notification data"),
   },
@@ -21,6 +26,10 @@ export const createContact = createRoute({
     [HttpStatusCodes.BAD_REQUEST]: jsonContent(
       badRequestSchema,
       "Invalid request data",
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      badRequestSchema,
+      "Unauthorized",
     ),
   },
 });

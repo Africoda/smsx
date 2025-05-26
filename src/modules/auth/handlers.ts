@@ -1,12 +1,13 @@
-import { setCookie } from "hono/cookie";
-import * as jwt from "jsonwebtoken";
+import { getCookie, setCookie } from "hono/cookie";
+import { jwtVerify, SignJWT } from "jose";
+import { randomUUID } from "node:crypto";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
 
 import env from "@/env";
 
-import type { LoginRoute, RegisterRoute } from "./routes";
+import type { LoginRoute, LogoutRoute, RefreshRoute, RegisterRoute } from "./routes";
 
 import Auth from "./services";
 
@@ -25,22 +26,34 @@ export const login: AppRouteHandler<LoginRoute> = async (c) => {
 
   if (!user) {
     return c.json({
-      message: "Invalid email or password",
+      message: "Invalid credentials",
     }, HttpStatusCodes.UNAUTHORIZED);
   }
 
-  const token = jwt.sign(
+  const accessToken = await new SignJWT(
     { userId: user.id },
-    env.JWT_SECRET,
-    { expiresIn: "24h" },
-  );
+  )
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("15m")
+    .sign(new TextEncoder().encode(env.JWT_SECRET),
+    );
 
+  const refreshToken = randomUUID();
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7); // 7 days
+
+  await Auth.storeRefreshToken(user.id, refreshToken, expiresAt);
+
+  // Set the refresh token in a secure, HTTP-only cookie
+  // Note: Ensure that the client is served over HTTPS in production
+  // to use secure cookies properly.
+  // Set CORS headers
   c.header("Access-Control-Allow-Credentials", "true");
   c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   c.header("Access-Control-Allow-Headers", "*");
   // c.header("Access-Control-Allow-Origin", env.CLIENT_ORIGIN_URL);
 
-  setCookie(c, "token", token, {
+  setCookie(c, "refreshToken", refreshToken, {
     expires: new Date(new Date().setDate(new Date().getDate() + 7)),
     secure: true,
     sameSite: "None",
@@ -48,8 +61,64 @@ export const login: AppRouteHandler<LoginRoute> = async (c) => {
   });
 
   return c.json({
-    token,
+    token: accessToken,
     user,
     message: "Login Successful",
   }, HttpStatusCodes.OK);
+};
+
+export const refresh: AppRouteHandler<RefreshRoute> = async (c) => {
+  const token = getCookie(c, "refreshToken");
+
+  if (!token) {
+    return c.json({ message: "No refresh token" }, 401);
+  }
+
+  const existing = await Auth.getRefreshToken(token);
+  if (!existing || existing.expiresAt < new Date()) {
+    return c.json({ message: "Refresh token expired or invalid" }, 401);
+  }
+
+  // Optional: rotate token
+  const newToken = randomUUID();
+  const newExpires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
+  await Auth.rotateToken(existing.token, newToken, newExpires);
+
+  const accessToken = await new SignJWT(
+    { userId: existing.userId },
+  )
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("15m")
+    .sign(new TextEncoder().encode(env.JWT_SECRET));
+
+  setCookie(c, "refreshToken", newToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+    path: "/",
+    expires: newExpires,
+  });
+
+  return c.json({ token: accessToken, message: "Token refreshed" });
+};
+
+export const logout: AppRouteHandler<LogoutRoute> = async (c) => {
+  const token = getCookie(c, "refreshToken");
+  if (token) {
+    await Auth.deleteRefreshToken(token);
+  }
+  else {
+    return c.json({ message: "Not authenticated" }, HttpStatusCodes.UNAUTHORIZED);
+  }
+
+  setCookie(c, "refreshToken", "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+    path: "/",
+    expires: new Date(0),
+  });
+
+  return c.json({ message: "Logged out" });
 };
