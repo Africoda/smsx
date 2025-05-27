@@ -15,7 +15,7 @@ export const contactService = {
     }
     catch (error) {
       throw new AppError(
-        "Failed to create notification",
+        "Failed to create contact",
         HttpStatusCodes.INTERNAL_SERVER_ERROR,
         {
           cause: error,
