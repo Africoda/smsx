@@ -71,12 +71,12 @@ export const refresh: AppRouteHandler<RefreshRoute> = async (c) => {
   const token = getCookie(c, "refreshToken");
 
   if (!token) {
-    return c.json({ message: "No refresh token" }, 401);
+    return c.json({ message: "No refresh token" }, HttpStatusCodes.UNAUTHORIZED);
   }
 
   const existing = await Auth.getRefreshToken(token);
   if (!existing || existing.expiresAt < new Date()) {
-    return c.json({ message: "Refresh token expired or invalid" }, 401);
+    return c.json({ message: "Refresh token expired or invalid" }, HttpStatusCodes.UNAUTHORIZED);
   }
 
   // Optional: rotate token
