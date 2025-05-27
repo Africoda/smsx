@@ -11,6 +11,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.13.8
         version: 1.13.8(hono@4.7.4)
+      '@hono/swagger-ui':
+        specifier: ^0.5.1
+        version: 0.5.1(hono@4.7.4)
       '@hono/zod-openapi':
         specifier: ^0.18.4
         version: 0.18.4(hono@4.7.4)(zod@3.24.2)
@@ -50,6 +53,9 @@ importers:
       hono-pino:
         specifier: ^0.7.2
         version: 0.7.2(hono@4.7.4)(pino@9.6.0)
+      jose:
+        specifier: ^6.0.11
+        version: 6.0.11
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -102,6 +108,9 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.7.3
+      undici:
+        specifier: ^7.10.0
+        version: 7.10.0
       vitest:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@22.13.10)
@@ -849,6 +858,11 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
+
+  '@hono/swagger-ui@0.5.1':
+    resolution: {integrity: sha512-XpUCfszLJ9b1rtFdzqOSHfdg9pfBiC2J5piEjuSanYpDDTIwpMz0ciiv5N3WWUaQpz9fEgH8lttQqL41vIFuDA==}
+    peerDependencies:
+      hono: '*'
 
   '@hono/zod-openapi@0.18.4':
     resolution: {integrity: sha512-6NHMHU96Hh32B1yDhb94Z4Z5/POsmEu2AXpWLWcBq9arskRnOMt2752yEoXoADV8WUAc7H1IkNaQHGj1ytXbYw==}
@@ -2123,6 +2137,9 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
+  jose@6.0.11:
+    resolution: {integrity: sha512-QxG7EaliDARm1O1S8BGakqncGT9s25bKL1WSf6/oa17Tkqwi8D2ZNglqCF+DsYF88/rV66Q/Q2mFAy697E1DUg==}
+
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
@@ -3029,6 +3046,10 @@ packages:
   undici-types@6.20.0:
     resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
 
+  undici@7.10.0:
+    resolution: {integrity: sha512-u5otvFBOBZvmdjWLVW+5DAc9Nkq8f24g0O9oY7qw2JVIF1VocIFoyz9JFkuVOS2j41AufeO0xnlweJ2RLT8nGw==}
+    engines: {node: '>=20.18.1'}
+
   unist-util-is@6.0.0:
     resolution: {integrity: sha512-2qCTHimwdxLfz+YzdGfkqNlH0tLi9xjTnHddPmJwtIG9MGsdbutfTc4P+haPD7l7Cjxf/WZj+we5qfVPvvxfYw==}
 
@@ -3683,6 +3704,10 @@ snapshots:
       levn: 0.4.1
 
   '@hono/node-server@1.13.8(hono@4.7.4)':
+    dependencies:
+      hono: 4.7.4
+
+  '@hono/swagger-ui@0.5.1(hono@4.7.4)':
     dependencies:
       hono: 4.7.4
 
@@ -5041,6 +5066,8 @@ snapshots:
 
   isexe@2.0.0: {}
 
+  jose@6.0.11: {}
+
   joycon@3.1.1: {}
 
   js-base64@3.7.7: {}
@@ -6119,6 +6146,8 @@ snapshots:
   ufo@1.5.4: {}
 
   undici-types@6.20.0: {}
+
+  undici@7.10.0: {}
 
   unist-util-is@6.0.0:
     dependencies:

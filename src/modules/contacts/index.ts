@@ -6,9 +6,6 @@ import * as routes from "./routes";
 const router = createRouter();
 
 router
-  .openapi(routes.register, handlers.register)
-  .openapi(routes.login, handlers.login)
-  .openapi(routes.refreshToken, handlers.refresh)
-  .openapi(routes.logout, handlers.logout);
+  .openapi(routes.createContact, handlers.create);
 
 export default router;

@@ -1,5 +1,5 @@
 {
-  "name": "hono-open-api-starter",
+  "name": "smsx",
   "type": "module",
   "version": "1.0.0",
   "license": "MIT",
@@ -10,10 +10,12 @@
     "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
     "test": "cross-env NODE_ENV=test vitest",
-    "build": "tsc && tsc-alias"
+    "build": "tsc && tsc-alias",
+    "migrate": "drizzle-kit push"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.8",
+    "@hono/swagger-ui": "^0.5.1",
     "@hono/zod-openapi": "^0.18.4",
     "@hono/zod-validator": "^0.5.0",
     "@libsql/client": "^0.14.0",
@@ -27,6 +29,7 @@
     "drizzle-zod": "^0.5.1",
     "hono": "^4.7.4",
     "hono-pino": "^0.7.2",
+    "jose": "^6.0.11",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.0",
     "pino": "^9.6.0",
@@ -46,6 +49,7 @@
     "tsc-alias": "^1.8.11",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3",
+    "undici": "^7.10.0",
     "vitest": "^2.1.9"
   }
 }
