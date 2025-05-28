@@ -13,3 +13,12 @@ export const auth = {
   logout: z.object({}),
   me: z.object({}),
 };
+
+export const GoogleAuthSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  name: z.string().optional(),
+  picture: z.string().optional()
+});
+
+export type GoogleAuthData = z.infer<typeof GoogleAuthSchema>;

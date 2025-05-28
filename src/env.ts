@@ -11,34 +11,18 @@ expand(config({
   ),
 }));
 
-const EnvSchema = z.object({
-  NODE_ENV: z.string().default("development"),
-  PORT: z.coerce.number().default(9999),
-  LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]),
-  DATABASE_URL: z.string().url(),
+const envSchema = z.object({
+  NODE_ENV: z.enum(["development", "production", "test"]),
+  PORT: z.coerce.number(),
+  LOG_LEVEL: z.enum(["trace", "debug", "info", "warn", "error", "fatal", "silent"]),
+  DATABASE_URL: z.string(),
+  JWT_SECRET: z.string(),
   DATABASE_AUTH_TOKEN: z.string().optional(),
-  JWT_SECRET: z.string().min(6),
-}).superRefine((input, ctx) => {
-  if (input.NODE_ENV === "production" && !input.DATABASE_AUTH_TOKEN) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.invalid_type,
-      expected: "string",
-      received: "undefined",
-      path: ["DATABASE_AUTH_TOKEN"],
-      message: "Must be set when NODE_ENV is 'production'",
-    });
-  }
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  CLIENT_ORIGIN_URL: z.string().url(),
 });
 
-export type env = z.infer<typeof EnvSchema>;
+const env = envSchema.parse(process.env);
 
-// eslint-disable-next-line ts/no-redeclare
-const { data: env, error } = EnvSchema.safeParse(process.env);
-
-if (error) {
-  console.error("❌ Invalid env:");
-  console.error(JSON.stringify(error.flatten().fieldErrors, null, 2));
-  process.exit(1);
-}
-
-export default env!;
+export default env;

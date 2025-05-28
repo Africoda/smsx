@@ -1,10 +1,18 @@
 import * as bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
+import { OAuth2Client, TokenPayload } from 'google-auth-library';
+import env from '@/env';
 
 import db from "@/db";
 import { users } from "@/db/schema/schema";
 
-const Auth = {
+const client = new OAuth2Client(
+  env.GOOGLE_CLIENT_ID,
+  env.GOOGLE_CLIENT_SECRET,
+  `${env.CLIENT_ORIGIN_URL}/auth/google/callback`
+);
+
+const authService = {
   async register(email: string, password: string) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -41,6 +49,23 @@ const Auth = {
       where: eq(users.id, id),
     });
   },
+
+  async verifyGoogleToken(token: string) {
+    const { tokens } = await client.getToken(token);
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token!,
+      audience: env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload() as TokenPayload;
+    
+    return {
+      id: payload.sub,
+      email: payload.email,
+      name: payload.name,
+      picture: payload.picture
+    };
+  }
 };
 
-export default Auth;
+export default authService;

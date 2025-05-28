@@ -2,11 +2,13 @@ import type { OpenAPIHono, RouteConfig, RouteHandler } from "@hono/zod-openapi";
 import type { Schema } from "hono";
 import type { PinoLogger } from "hono-pino";
 import type { JwtVariables } from "hono/jwt";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
 export interface AppBindings {
   Variables: {
     logger: PinoLogger;
     jwt: JwtVariables;
+    db: PostgresJsDatabase;
   };
 };
 
