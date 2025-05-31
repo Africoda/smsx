@@ -11,7 +11,7 @@ export const createContact = createRoute({
   method: "post",
   tags: ["Contacts"],
   request: {
-    body: jsonContentRequired(insertContactsSchema, "Notification data"),
+    body: jsonContentRequired(insertContactsSchema, "Contact data"),
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
