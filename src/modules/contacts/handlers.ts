@@ -20,5 +20,6 @@ export const create: AppRouteHandler<CreateContactRoute> = async (c) => {
   if (!contact) {
     return c.json({ message: "Failed to create contact" }, HttpStatusCodes.BAD_REQUEST);
   }
+
   return c.json(contact, HttpStatusCodes.CREATED);
 };

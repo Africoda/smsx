@@ -10,11 +10,6 @@ export const createContact = createRoute({
   path: "/contacts",
   method: "post",
   tags: ["Contacts"],
-  security: [
-    {
-      Bearer: [],
-    },
-  ],
   request: {
     body: jsonContentRequired(insertContactsSchema, "Notification data"),
   },
