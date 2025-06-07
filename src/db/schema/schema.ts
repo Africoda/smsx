@@ -52,7 +52,7 @@ export const messages = pgTable("messages", {
   status: text("status").default("pending"), 
   providerResponse: text("provider_response"), 
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
 
 
