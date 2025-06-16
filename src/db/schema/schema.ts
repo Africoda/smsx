@@ -43,16 +43,19 @@ export type NewUser = typeof users.$inferInsert;
 export type Contact = typeof contacts.$inferSelect;
 export type NewContact = typeof contacts.$inferInsert;
 
+// Define enum for message status
+const messageStatusEnum = pgEnum("message_status", ["pending", "sent", "failed"]);
+
 // messages table
 export const messages = pgTable("messages", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id),
   contactId: uuid("contact_id").notNull().references(() => contacts.id),
   content: text("content").notNull(),
-  status: text("status").default("pending"), 
+  status: messageStatusEnum("status").default("pending"), 
   providerResponse: text("provider_response"), 
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
 
 
