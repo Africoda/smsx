@@ -8,7 +8,7 @@ import contactService from "./service";
 
 export const create: AppRouteHandler<CreateContactRoute> = async (c) => {
   const data = c.req.valid("json");
-  const userId = c.get("jwt").jwtPayload?.userId;
+  const userId = c.get("jwtPayload")?.userId;
   if (!userId) {
     return c.json({ message: "Unauthorized" }, HttpStatusCodes.UNAUTHORIZED);
   }
