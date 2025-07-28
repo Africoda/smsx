@@ -2,11 +2,9 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
 
-import db from "@/db";
-
 import type { SendBulkSmsRoute } from "./routes";
 
-import { getContactIdByPhone, messageService, sendBulkSMS } from "./service";
+import { messageService, sendBulkSMS } from "./service";
 
 /**
  * Sends bulk SMS and logs to DB.
