@@ -1,40 +1,54 @@
-import type { Context } from "hono";
+import * as HttpStatusCodes from "stoker/http-status-codes";
 
-import { getContactIdByPhone, insertMessageToDb, sendToMNotify } from "./service";
+import type { AppRouteHandler } from "@/lib/types";
+
+import db from "@/db";
+
+import type { SendBulkSmsRoute } from "./routes";
+
+import { getContactIdByPhone, messageService, sendBulkSMS } from "./service";
 
 /**
  * Sends bulk SMS and logs to DB.
  */
-export async function sendBulkSmsHandler(c: Context) {
-  const body = await c.req.json();
+
+export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
+  const body = c.req.valid("json");
   const { sender, message, recipients } = body;
 
   let totalSent = 0;
   let totalFailed = 0;
 
-  for (const phone of recipients) {
-    try {
-      const response = await sendToMNotify(sender, phone, message);
+  try {
+    const response = await sendBulkSMS(sender, message, recipients);
 
-      const contactId = await getContactIdByPhone(phone);
+    const campaignData = await messageService.createCampaign({
+      userId: c.get("jwtPayload")?.userId,
+      name: `Bulk SMS - ${new Date().toISOString()}`,
+      description: `Bulk SMS sent on ${new Date().toISOString()}`,
+    });
 
-      await insertMessageToDb({
-        phone,
-        contactId,
-        message,
-        status: "sent",
-        response,
-      });
+    await messageService.createMessageHistory({
+      campaignId: campaignData.id,
+      status: "sent",
+      recipient_contacts: recipients,
+      content: message,
+      providerResponse: response.message,
+    });
 
-      totalSent++;
-    } catch (err) {
-      totalFailed++;
-    }
+    totalSent = recipients.length;
+  }
+  catch (err) {
+    console.error("Failed to send bulk SMS:", err);
+    totalFailed = recipients.length;
   }
 
-  return c.json({
-    status: "success",
-    totalSent,
-    totalFailed,
-  });
-}
+  return c.json(
+    {
+      status: "success",
+      totalSent,
+      totalFailed,
+    },
+    HttpStatusCodes.OK,
+  );
+};

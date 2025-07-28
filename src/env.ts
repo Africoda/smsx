@@ -22,6 +22,7 @@ const EnvSchema = z.object({
   SMTP_PORT: z.coerce.number().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
+  MNOTIFY_API_KEY: z.string().optional(),
 }).superRefine((input, ctx) => {
   if (input.NODE_ENV === "production" && !input.DATABASE_AUTH_TOKEN) {
     ctx.addIssue({

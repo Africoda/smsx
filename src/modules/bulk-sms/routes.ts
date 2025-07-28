@@ -3,9 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { z } from "zod";
 
-import { sendBulkSmsHandler } from "./handlers";
-
-export const sendBulkSmsRoute = createRoute({
+export const sendBulkSms = createRoute({
   method: "post",
   path: "/send-bulk-sms",
   tags: ["Bulk SMS"],
@@ -16,6 +14,7 @@ export const sendBulkSmsRoute = createRoute({
         message: z.string().min(1),
         recipients: z.array(z.string().min(10)), // List of phone numbers
       }),
+      "Send Bulk SMS Request",
     ),
   },
   responses: {
@@ -25,10 +24,17 @@ export const sendBulkSmsRoute = createRoute({
         totalSent: z.number(),
         totalFailed: z.number(),
       }),
+      "Send Bulk SMS Response",
     ),
     [HttpStatusCodes.BAD_REQUEST]: jsonContent(
       z.object({ error: z.string() }),
+      "Bad Request",
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({ error: z.string() }),
+      "Internal Server Error",
     ),
   },
-  handler: sendBulkSmsHandler,
 });
+
+export type SendBulkSmsRoute = typeof sendBulkSms;
