@@ -4,6 +4,7 @@ import env from "@/env";
 import configureOpenAPI from "@/lib/configure-open-api";
 import createApp from "@/lib/create-app";
 import auth from "@/modules/auth/index";
+import sendBulkSms from "@/modules/bulk-sms/index";
 import contact from "@/modules/contacts/index";
 import index from "@/routes/index";
 
@@ -13,7 +14,7 @@ configureOpenAPI(app);
 
 const publicRoutes = [auth] as const;
 
-const routes = [index, contact] as const;
+const routes = [index, contact, sendBulkSms] as const;
 
 for (const route of publicRoutes) {
   app.route("/api", route);
