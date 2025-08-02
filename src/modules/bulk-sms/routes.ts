@@ -5,14 +5,14 @@ import { z } from "zod";
 
 export const sendBulkSms = createRoute({
   method: "post",
-  path: "/send-bulk-sms",
-  tags: ["Bulk SMS"],
+  path: "/send",
+  tags: ["Bulk SMS", "SMS"],
   request: {
     body: jsonContentRequired(
       z.object({
         sender: z.string().min(1),
         message: z.string().min(1),
-        recipients: z.array(z.string().min(10)), // List of phone numbers
+        recipients: z.array(z.string().min(1)), // List of phone numbers
       }),
       "Send Bulk SMS Request",
     ),

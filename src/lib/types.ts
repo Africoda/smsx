@@ -3,10 +3,13 @@ import type { Schema } from "hono";
 import type { PinoLogger } from "hono-pino";
 import type { JwtVariables } from "hono/jwt";
 
+interface User {
+  id: string;
+}
 export interface AppBindings {
   Variables: {
     logger: PinoLogger;
-    jwt: JwtVariables;
+    jwt: JwtVariables<User>;
   };
 };
 

@@ -75,6 +75,34 @@ export const messageService = {
       );
     }
   },
+
+  async createCampaignWithHistory(
+    campaignData: NewCampaign,
+    historyData: Omit<NewMessageHistory, "campaignId">,
+  ): Promise<{ campaign: Campaign; history: MessageHistory }> {
+    try {
+      const result = await db.transaction(async (tx) => {
+        const [campaign] = await tx.insert(campaigns).values(campaignData).returning();
+        const [history] = await tx.insert(messageHistory).values({
+          ...historyData,
+          campaignId: campaign.id,
+        }).returning();
+
+        return { campaign, history };
+      });
+
+      return result;
+    }
+    catch (error) {
+      throw new AppError(
+        "Failed to create campaign with history",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR,
+        {
+          cause: error,
+        },
+      );
+    }
+  },
 };
 
 /*
@@ -105,8 +133,11 @@ export const contactService = {
       return userContacts;
     }
     catch (error) {
-      console.error("Error fetching contacts:", error);
-      throw new Error("Could not fetch contacts");
+      throw new AppError(
+        "Failed to fetch contacts",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR,
+        { cause: error },
+      );
     }
   },
 };
@@ -120,7 +151,7 @@ export async function sendBulkSMS(
   phone: string | string[],
 ) {
   const mnotify = new MNotify({
-    apiKey: env.MNOTIFY_API_KEY || "",
+    apiKey: env.MNOTIFY_API_KEY,
   });
 
   try {

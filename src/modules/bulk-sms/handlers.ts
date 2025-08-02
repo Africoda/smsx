@@ -2,6 +2,8 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { AppRouteHandler } from "@/lib/types";
 
+import { AppError } from "@/utils/error";
+
 import type { SendBulkSmsRoute } from "./routes";
 
 import { messageService, sendBulkSMS } from "./service";
@@ -20,25 +22,59 @@ export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
   try {
     const response = await sendBulkSMS(sender, message, recipients);
 
-    const campaignData = await messageService.createCampaign({
-      userId: c.get("jwtPayload")?.userId,
-      name: `Bulk SMS - ${new Date().toISOString()}`,
-      description: `Bulk SMS sent on ${new Date().toISOString()}`,
-    });
+    // Always store the campaign attempt
+    await messageService.createCampaignWithHistory(
+      {
+        userId: c.get("jwtPayload").userId,
+        name: `Bulk SMS - ${new Date().toISOString()}`,
+        description: `Bulk SMS ${response.status === "success" ? "sent" : "failed"} on ${new Date().toISOString()}`,
+      },
+      {
+        status: response.status === "success" ? "sent" : "failed",
+        recipient_contacts: recipients,
+        content: message,
+        providerResponse: response.message,
+      },
+    );
 
-    await messageService.createMessageHistory({
-      campaignId: campaignData.id,
-      status: "sent",
-      recipient_contacts: recipients,
-      content: message,
-      providerResponse: response.message,
-    });
-
-    totalSent = recipients.length;
+    if (response.status === "success") {
+      totalSent = recipients.length;
+    }
+    else {
+      totalFailed = recipients.length;
+      return c.json(
+        { error: response.message || "Failed to send bulk SMS" },
+        HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
-  catch (err) {
-    console.error("Failed to send bulk SMS:", err);
+  catch (error: any) {
     totalFailed = recipients.length;
+
+    // Store failed campaign due to system error
+    try {
+      await messageService.createCampaignWithHistory(
+        {
+          userId: c.get("jwtPayload").userId,
+          name: `Bulk SMS - ${new Date().toISOString()}`,
+          description: `Bulk SMS failed due to system error on ${new Date().toISOString()}`,
+        },
+        {
+          status: "failed",
+          recipient_contacts: recipients,
+          content: message,
+          providerResponse: error.message || "Unknown error",
+        },
+      );
+    }
+    catch (dbError) {
+      console.error("Failed to log campaign history:", dbError);
+      throw new AppError(
+        "Failed to log campaign history",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR,
+        { cause: dbError },
+      );
+    }
   }
 
   return c.json(
