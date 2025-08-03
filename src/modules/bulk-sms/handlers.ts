@@ -53,20 +53,6 @@ export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
     console.error("Bulk SMS error:", error);
     totalFailed = recipients.length;
 
-    if (error instanceof AppError) {
-      const cause = error.cause as any; // or define a proper interface
-
-      // Extract the most meaningful message
-      const errorMsg
-      = cause?.data?.error // MNotify specific error
-        || cause?.message // Generic error
-        || error.message; // Fallback
-      return c.json(
-        { error: errorMsg },
-        HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      );
-    }
-
     // Store failed campaign due to system error
     try {
       await messageService.createCampaignWithHistory(
@@ -82,6 +68,20 @@ export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
           providerResponse: error.message || "Unknown error",
         },
       );
+
+      if (error instanceof AppError) {
+        const cause = error.cause as any; // or define a proper interface
+
+        // Extract the most meaningful message
+        const errorMsg
+      = cause?.data?.error // MNotify specific error
+        || cause?.message // Generic error
+        || error.message; // Fallback
+        return c.json(
+          { error: errorMsg },
+          HttpStatusCodes.INTERNAL_SERVER_ERROR,
+        );
+      }
     }
     catch (dbError) {
       console.error("Failed to log campaign history:", dbError);
