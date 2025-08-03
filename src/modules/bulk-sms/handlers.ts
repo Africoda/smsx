@@ -9,7 +9,7 @@ import type { SendBulkSmsRoute } from "./routes";
 import { messageService, sendBulkSMS } from "./service";
 
 /**
- * Sends bulk SMS and logs to DB.
+ * Sends bulk  and logs to DB.
  */
 
 export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
@@ -21,6 +21,7 @@ export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
 
   try {
     const response = await sendBulkSMS(sender, message, recipients);
+    console.log("Bulk SMS response:", response);
 
     // Always store the campaign attempt
     await messageService.createCampaignWithHistory(
@@ -49,7 +50,22 @@ export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
     }
   }
   catch (error: any) {
+    console.error("Bulk SMS error:", error);
     totalFailed = recipients.length;
+
+    if (error instanceof AppError) {
+      const cause = error.cause as any; // or define a proper interface
+
+      // Extract the most meaningful message
+      const errorMsg
+      = cause?.data?.error // MNotify specific error
+        || cause?.message // Generic error
+        || error.message; // Fallback
+      return c.json(
+        { error: errorMsg },
+        HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      );
+    }
 
     // Store failed campaign due to system error
     try {
