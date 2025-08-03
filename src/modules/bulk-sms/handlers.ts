@@ -40,7 +40,21 @@ export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
     console.error("Failed to send bulk SMS:", err);
     totalFailed = recipients.length;
   }
-
+  if (totalFailed > 0) {
+    await messageService.createMessageHistory({
+      campaignId: "", // No campaign created if failed
+      status: "failed",
+      recipient_contacts: recipients,
+      content: message,
+      providerResponse: "Failed to send bulk SMS",
+    });
+    return c.json(
+      {
+        error: "Failed to send bulk SMS",
+      },
+      HttpStatusCodes.INTERNAL_SERVER_ERROR,
+    );
+  }
   return c.json(
     {
       status: "success",

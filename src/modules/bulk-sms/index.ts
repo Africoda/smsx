@@ -6,6 +6,6 @@ import * as routes from "./routes";
 const router = createRouter();
 
 router
-  .openapi(routes.sendBulkSmsRoute, handlers.sendBulkSmsHandler);
+  .openapi(routes.sendBulkSms, handlers.sendBulkSms);
 
 export default router;
