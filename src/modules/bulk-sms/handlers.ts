@@ -9,7 +9,7 @@ import type { SendBulkSmsRoute } from "./routes";
 import { messageService, sendBulkSMS } from "./service";
 
 /**
- * Sends bulk  and logs to DB.
+ * Sends bulk SMS and logs to DB.
  */
 
 export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
