@@ -21,7 +21,6 @@ export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
 
   try {
     const response = await sendBulkSMS(sender, message, recipients);
-    console.log("Bulk SMS response:", response);
 
     // Always store the campaign attempt
     await messageService.createCampaignWithHistory(
