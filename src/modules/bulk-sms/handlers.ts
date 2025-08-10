@@ -15,49 +15,48 @@ import { messageService, sendBulkSMS } from "./service";
 export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
   const body = c.req.valid("json");
   const { sender, message, recipients } = body;
+  const userId = c.get("jwtPayload").userId;
 
   let totalSent = 0;
   let totalFailed = 0;
 
   try {
-    const response = await sendBulkSMS(sender, message, recipients);
-    console.log("Bulk SMS response:", response);
+    const response = await sendBulkSMS(userId, sender || "", message, recipients);
 
     // Always store the campaign attempt
     await messageService.createCampaignWithHistory(
       {
-        userId: c.get("jwtPayload").userId,
+        userId,
         name: `Bulk SMS - ${new Date().toISOString()}`,
-        description: `Bulk SMS ${response.status === "success" ? "sent" : "failed"} on ${new Date().toISOString()}`,
+        description: `Bulk SMS ${response.success ? "sent" : "failed"} via ${response.providerName} on ${new Date().toISOString()}`,
       },
       {
-        status: response.status === "success" ? "sent" : "failed",
+        status: response.success ? "sent" : "failed",
         recipient_contacts: recipients,
         content: message,
-        providerResponse: response.message,
+        providerResponse: JSON.stringify(response.result),
       },
     );
 
-    if (response.status === "success") {
+    if (response.success) {
       totalSent = recipients.length;
     }
     else {
       totalFailed = recipients.length;
       return c.json(
-        { error: response.message || "Failed to send bulk SMS" },
+        { error: "Failed to send bulk SMS" },
         HttpStatusCodes.INTERNAL_SERVER_ERROR,
       );
     }
   }
   catch (error: any) {
-    console.error("Bulk SMS error:", error);
     totalFailed = recipients.length;
 
     // Store failed campaign due to system error
     try {
       await messageService.createCampaignWithHistory(
         {
-          userId: c.get("jwtPayload").userId,
+          userId,
           name: `Bulk SMS - ${new Date().toISOString()}`,
           description: `Bulk SMS failed due to system error on ${new Date().toISOString()}`,
         },

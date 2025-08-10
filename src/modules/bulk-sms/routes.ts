@@ -10,7 +10,7 @@ export const sendBulkSms = createRoute({
   request: {
     body: jsonContentRequired(
       z.object({
-        sender: z.string().min(1),
+        sender: z.string().min(1).optional().nullable(), // Made optional and nullable
         message: z.string().min(1),
         recipients: z.array(z.string().min(1)), // List of phone numbers
       }),
