@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { MNotify } from "mnotify-ts-sdk";
 import * as HttpStatusCodes from "stoker/http-status-codes";
+import * as crypto from "crypto";
 
 import type { Campaign, Message, MessageHistory, NewCampaign, NewMessage, NewMessageHistory } from "@/db/schema/schema";
 
@@ -148,7 +149,7 @@ export const selectProvider = {
 
       if (userProviders.length > 0) {
         // Select random provider from user's providers
-        const randomProvider = userProviders[Math.floor(Math.random() * userProviders.length)];
+        const randomProvider = userProviders[crypto.randomInt(userProviders.length)];
         return {
           type: "user_random",
           provider: randomProvider,
@@ -168,7 +169,7 @@ export const selectProvider = {
 
       if (systemProviders.length > 0) {
         // Select random system provider
-        const randomSystemProvider = systemProviders[Math.floor(Math.random() * systemProviders.length)];
+        const randomSystemProvider = systemProviders[crypto.randomInt(systemProviders.length)];
         return {
           type: "system_default",
           provider: randomSystemProvider,
