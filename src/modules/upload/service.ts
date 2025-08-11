@@ -29,7 +29,9 @@ export const uploadService = {
             userId,
           });
         } else {
-          errors.push(`Row ${index + 2}: ${result.error.issues[0].message}`);
+          result.error.issues.forEach(issue => {
+            errors.push(`Row ${index + 2} [${issue.path.join('.') || 'unknown field'}]: ${issue.message}`);
+          });
         }
       });
 
