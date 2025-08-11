@@ -19,10 +19,13 @@ const router = createRouter()
       },
     }),
     (c) => {
-      return c.json({
-        message: "SMSX API",
-      }, HttpStatusCodes.OK);
-    },
+      return c.json(
+        {
+          message: "SMSX API",
+        },
+        HttpStatusCodes.OK
+      );
+    }
   );
 
 export default router;
