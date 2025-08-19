@@ -72,10 +72,10 @@ export const sendBulkSms: AppRouteHandler<SendBulkSmsRoute> = async (c) => {
         const cause = error.cause as any; // or define a proper interface
 
         // Extract the most meaningful message
-        const errorMsg =
-          cause?.data?.error // MNotify specific error
-          || cause?.message // Generic error
-          || error.message; // Fallback
+        const errorMsg
+          = cause?.data?.error // MNotify specific error
+            || cause?.message // Generic error
+            || error.message; // Fallback
         return c.json(
           { error: errorMsg },
           HttpStatusCodes.INTERNAL_SERVER_ERROR,

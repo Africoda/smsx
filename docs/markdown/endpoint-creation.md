@@ -30,10 +30,9 @@ The `openapi()` method links:
 ### Simple Example
 
 ```ts
-import { createMessageObjectSchema } from "@/shared/schemas";
-
 import { createRouter } from "@/lib/create-app";
 import { createRoute, HttpStatusCodes, jsonContent } from "@/lib/types";
+import { createMessageObjectSchema } from "@/shared/schemas";
 
 const router = createRouter()
   .openapi(
