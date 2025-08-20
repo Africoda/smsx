@@ -1,4 +1,3 @@
-import { eq } from "drizzle-orm";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { Contact, NewContact } from "@/db/schema/schema";

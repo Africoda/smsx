@@ -55,7 +55,6 @@ each other. APIs define how different systems or components can interact, enabli
 
 - **What other protocols are there besides HTTP?**
   In addition to HTTP, other common protocols include:
-
   - **HTTPS**: Secure version of HTTP that uses SSL/TLS for encryption.
   - **FTP (File Transfer Protocol)**: Used to transfer files between computers over a network.
   - **SMTP (Simple Mail Transfer Protocol)**: Used to send email messages.

@@ -33,7 +33,7 @@ describe("auth Flow", () => {
     });
 
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = await res.json() as any;
 
     expect(body.token).toBeDefined();
     expect(body.user.email).toBe(testUser.email);
@@ -60,7 +60,7 @@ describe("auth Flow", () => {
       },
     });
 
-    const body = await refreshRes.json();
+    const body = await refreshRes.json() as any;
 
     expect(refreshRes.status).toBe(200);
     expect(body.token).toBeDefined();
@@ -75,7 +75,7 @@ describe("auth Flow", () => {
     });
 
     expect(res.status).toBe(401);
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.error?.message || body.message).toMatch(/expired|invalid/i);
   });
   it("should logout and revoke refresh token", async () => {

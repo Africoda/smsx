@@ -99,7 +99,6 @@ creates a new user.
 
 - **URL**: A complete and absolute reference to a resource on the internet. It includes the protocol, hostname, port, path, query parameters, and
   fragment identifier.
-
   - Example: `http://example.com/users/1?filter=active#section`
 
 - **URI**: An identification of a resource. It can be part of a URL or stand alone as an identifier. URIs are used to locate resources within the
@@ -111,12 +110,10 @@ creates a new user.
 HTTP status codes provide information about the success or failure of an HTTP request, ranging from 200 (OK) to 500 (Internal Server Error).
 
 - **2xx Success**: Indicates that the request was successful.
-
   - **200 OK**: The server successfully returned the requested resource.
   - **201 Created**: A new resource has been created on the server.
 
 - **4xx Client Errors**: Indicate issues with the client's request.
-
   - **404 Not Found**: The requested resource could not be found on the server.
 
 - **5xx Server Errors**: Indicate issues with the server's response.

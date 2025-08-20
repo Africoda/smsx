@@ -1,5 +1,5 @@
 import { getCookie, setCookie } from "hono/cookie";
-import { jwtVerify, SignJWT } from "jose";
+import { SignJWT } from "jose";
 import { randomUUID } from "node:crypto";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
