@@ -242,13 +242,15 @@ export const userDefaultProviderService = {
   // User Default Provider CRUD
   async setDefaultProvider(data: NewUserDefaultSmsProvider): Promise<UserDefaultSmsProvider> {
     try {
-      // First, delete any existing default for this user
-      await db
-        .delete(userDefaultSmsProviders)
-        .where(eq(userDefaultSmsProviders.userId, data.userId));
-
-      // Then insert the new default
-      const defaultProvider = await db.insert(userDefaultSmsProviders).values(data).returning();
+      // Upsert: insert or update the default provider for this user atomically
+      const defaultProvider = await db
+        .insert(userDefaultSmsProviders)
+        .values(data)
+        .onConflictDoUpdate({
+          target: [userDefaultSmsProviders.userId],
+          set: data,
+        })
+        .returning();
       return defaultProvider[0];
     }
     catch (error) {
