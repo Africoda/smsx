@@ -1,7 +1,10 @@
+import type { Buffer } from "node:buffer";
+
 import { parse } from "csv-parse/sync";
 import * as HttpStatusCodes from "stoker/http-status-codes";
-import { AppError } from "@/utils/error";
 import { z } from "zod";
+
+import { AppError } from "@/utils/error";
 
 const contactSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -18,7 +21,7 @@ export const uploadService = {
         trim: true,
       });
 
-      const validContacts: { userId: string; name: string; phone: string; }[] = [];
+      const validContacts: { userId: string; name: string; phone: string }[] = [];
       const errors: string[] = [];
 
       rows.forEach((row: any, index: number) => {
@@ -28,9 +31,10 @@ export const uploadService = {
             ...result.data,
             userId,
           });
-        } else {
-          result.error.issues.forEach(issue => {
-            errors.push(`Row ${index + 2} [${issue.path.join('.') || 'unknown field'}]: ${issue.message}`);
+        }
+        else {
+          result.error.issues.forEach((issue) => {
+            errors.push(`Row ${index + 2} [${issue.path.join(".") || "unknown field"}]: ${issue.message}`);
           });
         }
       });
@@ -45,11 +49,12 @@ export const uploadService = {
           contacts: validContacts,
         },
       };
-    } catch (error) {
+    }
+    catch (error) {
       throw new AppError(
         "Failed to parse CSV file",
         HttpStatusCodes.BAD_REQUEST,
-        { cause: error }
+        { cause: error },
       );
     }
   },

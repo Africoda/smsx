@@ -23,9 +23,9 @@ const router = createRouter()
         {
           message: "SMSX API",
         },
-        HttpStatusCodes.OK
+        HttpStatusCodes.OK,
       );
-    }
+    },
   );
 
 export default router;
