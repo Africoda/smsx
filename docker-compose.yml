@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-9999}:9999"
+    environment:
+      - NODE_ENV=production
+      - PORT=9999
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - DATABASE_URL=postgresql://smsx:smsx_password@db:5432/smsx
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-30d}
+      - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION:-30d}
+      - MNOTIFY_API_KEY=${MNOTIFY_API_KEY}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - smsx-network
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=smsx
+      - POSTGRES_USER=smsx
+      - POSTGRES_PASSWORD=smsx_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U smsx]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - smsx-network
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+
+networks:
+  smsx-network:
+    driver: bridge

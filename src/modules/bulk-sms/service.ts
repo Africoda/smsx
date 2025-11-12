@@ -150,6 +150,13 @@ export async function sendBulkSMS(
   message: string,
   phone: string | string[],
 ) {
+  if (!env.MNOTIFY_API_KEY) {
+    throw new AppError(
+      "MNOTIFY_API_KEY is not configured",
+      HttpStatusCodes.INTERNAL_SERVER_ERROR,
+    );
+  }
+
   const mnotify = new MNotify({
     apiKey: env.MNOTIFY_API_KEY,
   });
