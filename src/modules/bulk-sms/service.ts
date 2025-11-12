@@ -196,7 +196,7 @@ export const selectProvider = {
   /**
    * Send SMS using the selected provider
    */
-  async sendSMS(providerConfig: any, sender: string, message: string, phone: string | string[]) {
+  async sendSMS(providerConfig: SmsProviderConfig, sender: string, message: string, phone: string | string[]) {
     try {
       switch (providerConfig.providerName.toLowerCase()) {
         case "mnotify":
