@@ -255,7 +255,7 @@ export const selectProvider = {
   /**
    * Send SMS via Twilio (placeholder - implement based on Twilio SDK)
    */
-  async sendViaTwilio(_apiKey: string, _sender: string, _message: string, _phone: string | string[]) {
+  async sendViaTwilio() {
     // TODO: Implement Twilio SMS sending
     throw new AppError(
       "Twilio provider not yet implemented",
