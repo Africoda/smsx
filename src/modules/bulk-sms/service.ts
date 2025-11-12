@@ -146,11 +146,11 @@ export const selectProvider = {
         .where(eq(userSmsProviderConfigs.userId, userId));
 
       if (userProviders.length > 0) {
-        // Select random provider from user's providers
-        const randomProvider = userProviders[crypto.randomInt(userProviders.length)];
+        // Select the first provider from user's providers (deterministic)
+        const selectedProvider = userProviders[0];
         return {
-          type: "user_random",
-          provider: randomProvider,
+          type: "user_first",
+          provider: selectedProvider,
         };
       }
 
