@@ -166,11 +166,11 @@ export const selectProvider = {
         .innerJoin(smsProviders, eq(systemSmsProviderConfigs.providerId, smsProviders.id));
 
       if (systemProviders.length > 0) {
-        // Select random system provider
-        const randomSystemProvider = systemProviders[crypto.randomInt(systemProviders.length)];
+        // Select the first system provider (deterministic)
+        const selectedSystemProvider = systemProviders[0];
         return {
           type: "system_default",
-          provider: randomSystemProvider,
+          provider: selectedSystemProvider,
         };
       }
 
