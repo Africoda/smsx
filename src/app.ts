@@ -7,13 +7,14 @@ import auth from "@/modules/auth/index";
 import sendBulkSms from "@/modules/bulk-sms/index";
 import contact from "@/modules/contacts/index";
 import upload from "@/modules/upload/index";
+import health from "@/routes/health";
 import index from "@/routes/index";
 
 const app = createApp();
 
 configureOpenAPI(app);
 
-const publicRoutes = [auth] as const;
+const publicRoutes = [auth, health] as const;
 
 const routes = [index, contact, sendBulkSms, upload] as const;
 
