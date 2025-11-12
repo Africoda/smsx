@@ -1,8 +1,6 @@
 import { eq } from "drizzle-orm";
 import { MNotify } from "mnotify-ts-sdk";
 import * as HttpStatusCodes from "stoker/http-status-codes";
-import * as crypto from "crypto";
-
 import type { Campaign, Message, MessageHistory, NewCampaign, NewMessage, NewMessageHistory } from "@/db/schema/schema";
 
 import db from "@/db";
