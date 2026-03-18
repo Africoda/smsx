@@ -3,9 +3,9 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 
 import { insertContactsSchema, selectContactsSchema } from "@/db/schema/schema";
-import { badRequestSchema } from "@/lib/constants";
+import { badRequestSchema, unauthorizedSchema } from "@/lib/constants";
 
-// Create notification route
+// Create contact route
 export const createContact = createRoute({
   path: "/contacts",
   method: "post",
@@ -28,7 +28,7 @@ export const createContact = createRoute({
       "Invalid request data",
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
-      badRequestSchema,
+      unauthorizedSchema,
       "Unauthorized",
     ),
   },
@@ -41,14 +41,15 @@ export const getContacts = createRoute({
   path: "/contacts",
   method: "get",
   tags: ["Contacts"],
+  security: [{ Bearer: [] }],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       selectContactsSchema.array(),
       "Contacts retrieved successfully",
     ),
-    [HttpStatusCodes.BAD_REQUEST]: jsonContent(
-      badRequestSchema,
-      "Invalid request data",
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      unauthorizedSchema,
+      "Unauthorized",
     ),
   },
 });

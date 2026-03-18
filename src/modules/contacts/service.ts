@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { Contact, NewContact } from "@/db/schema/schema";
@@ -19,6 +20,22 @@ export const contactService = {
         {
           cause: error,
         },
+      );
+    }
+  },
+
+  async getContactsByUserId(userId: string): Promise<Contact[]> {
+    try {
+      return await db
+        .select()
+        .from(contacts)
+        .where(eq(contacts.userId, userId));
+    }
+    catch (error) {
+      throw new AppError(
+        "Failed to fetch contacts",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR,
+        { cause: error },
       );
     }
   },

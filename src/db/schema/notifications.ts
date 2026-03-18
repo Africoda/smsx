@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const notifications = pgTable("notifications", {
@@ -7,6 +7,7 @@ export const notifications = pgTable("notifications", {
   message: text("message").notNull(),
   recipientId: uuid("recipient_id").notNull(),
   type: varchar("type", { length: 50 }).notNull(),
+  isRead: boolean("is_read").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

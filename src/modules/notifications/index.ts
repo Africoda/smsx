@@ -6,7 +6,8 @@ import * as routes from "./routes";
 const router = createRouter();
 
 router
-  .openapi(routes.createContact, handlers.create)
-  .openapi(routes.getContacts, handlers.list);
+  .openapi(routes.createNotification, handlers.create)
+  .openapi(routes.listNotifications, handlers.list)
+  .openapi(routes.markNotificationRead, handlers.markAsRead);
 
 export default router;
