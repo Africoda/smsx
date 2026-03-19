@@ -6,6 +6,14 @@ import { z } from "zod";
 import { insertNotificationSchema, selectNotificationSchema } from "@/db/schema/notifications";
 import { badRequestSchema, notFoundSchema, unauthorizedSchema } from "@/lib/constants";
 
+// Schema for creating a notification via the API (omit server-managed fields)
+const createNotificationBodySchema = insertNotificationSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  isRead: true,
+});
+
 // Create notification route
 export const createNotification = createRoute({
   path: "/notifications",
@@ -13,7 +21,7 @@ export const createNotification = createRoute({
   tags: ["Notifications"],
   security: [{ Bearer: [] }],
   request: {
-    body: jsonContentRequired(insertNotificationSchema, "Notification data"),
+    body: jsonContentRequired(createNotificationBodySchema, "Notification data"),
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
