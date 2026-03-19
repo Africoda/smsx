@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 
 import type { NewNotification, Notification } from "@/db/schema/notifications";
@@ -25,13 +25,18 @@ export const notificationService = {
   },
   async listNotifications(
     userId: string,
-  page = 1,
-  limit = 10,
+    page = 1,
+    limit = 10,
+    unreadOnly?: boolean,
   ): Promise<Notification[]> {
     const offset = (page - 1) * limit;
     try {
+      const conditions = unreadOnly === true
+        ? and(eq(notifications.recipientId, userId), eq(notifications.isRead, false))
+        : eq(notifications.recipientId, userId);
+
       const userNotifications = await db.query.notifications.findMany({
-        where: eq(notifications.recipientId, userId),
+        where: conditions,
         limit,
         offset,
         orderBy: (
@@ -44,6 +49,25 @@ export const notificationService = {
     catch (error) {
       throw new AppError(
         "Failed to fetch notifications",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR,
+        { cause: error },
+      );
+    }
+  },
+
+  async markAsRead(id: string, userId: string): Promise<Notification | null> {
+    try {
+      const updated = await db
+        .update(notifications)
+        .set({ isRead: true, updatedAt: new Date() })
+        .where(and(eq(notifications.id, id), eq(notifications.recipientId, userId)))
+        .returning();
+
+      return updated[0] ?? null;
+    }
+    catch (error) {
+      throw new AppError(
+        "Failed to mark notification as read",
         HttpStatusCodes.INTERNAL_SERVER_ERROR,
         { cause: error },
       );
